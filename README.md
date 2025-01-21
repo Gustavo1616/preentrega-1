@@ -6,14 +6,15 @@ Este es un proyecto de backend básico construido con Express para gestionar las
 
 1. Clona este repositorio:
 
-   ```bash
-   git clone [GitHub](https://github.com/Gustavo1616/preentrega-1)
-   cd preentregapf
+git clone [GitHub](https://github.com/Gustavo1616/preentrega-1)
+   
+## Dependencias
+Instala las dependencias:
+
 npm install
 
-
-## Dependencias
 Express: Framework web minimalista para Node.js.
+
 ## Uso
 Inicia el servidor:
 
