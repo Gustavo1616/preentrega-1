@@ -7,7 +7,7 @@ Este es un proyecto de backend básico construido con Express para gestionar las
 1. Clona este repositorio:
 
    ```bash
-   git clone [Github](https://github.com/Gustavo1616/preentrega-1)
+   git clone [GitHub](https://github.com/Gustavo1616/preentrega-1)
    cd preentregapf
 npm install
 
