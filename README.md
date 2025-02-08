@@ -1,6 +1,6 @@
 # Proyecto Backend con Express
 
-Este es un proyecto de backend básico construido con Express para gestionar las peticiones HTTP.
+Este es un proyecto de backend básico construido con Express, handlebars.
 
 ## Instalación
 

@@ -1,0 +1,13 @@
+<div>
+    <h1>BIENVENIDOS</h1>
+    <h3>Nuestros productos en venta:</h3>
+    <ul>
+        {{#each products}}
+            <li>
+                <h4>{{name}}</h4>
+                <p>{{description}}</p>
+                <p>precio: $ {{price}}</p>
+                <p>stock:  {{stock}} unidades</p>
+            </li>
+        {{/each}}
+</div>

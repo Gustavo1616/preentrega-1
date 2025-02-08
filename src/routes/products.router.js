@@ -5,7 +5,7 @@ const router = Router();
 
 router.get('/', (req, res) => {
   const products = ProductManager.getProducts();
-  res.json(products); 
+  res.render('index', {products});
 });
 
 router.get('/:id', (req, res) => {
@@ -66,5 +66,6 @@ router.delete('/:id', (req, res) => {
 
   res.json({ message: 'Product deleted', product: deletedProduct }); 
 });
+
 
 export default router;
