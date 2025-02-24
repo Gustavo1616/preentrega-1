@@ -1,16 +1,19 @@
 import express from "express";
 import { createServer } from "http";
-import { Server as socketIo } from 'socket.io';
-import ProductManager from './models/productManager.js';
-import productRouter from './routes/products.router.js';
-import cartRouter from './routes/carts.router.js';
 import handlebars from 'express-handlebars';
 import { dirname, } from 'path';
 import path from "path";
 import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
+import ProductModel from './models/product.model.js';
+import productsDBRouter from './routes/productsDB.router.js';
+import viewsRouter from './routes/views.router.js';
+import dotenv from "dotenv";
+import methodOverride from 'method-override';
+dotenv.config();
+
 
 const app = express();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -18,38 +21,34 @@ app.engine('handlebars', handlebars.engine());
 app.set('views', __dirname + '/views');
 app.set('public', __dirname + '/public');
 app.set('view engine', 'handlebars');
-
+app.use(methodOverride('_method'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
 
-app.use('/products', productRouter);
-app.use('/api/carts', cartRouter);
+app.use('/', viewsRouter);
+app.use('/products', productsDBRouter); //Creo nuevo router, para renderizar productos desde la base de datos
 
-app.get("/realtimeproducts", (req, res) => {
-    const products = ProductManager.getProducts();
+// ruta para volver al inicio
+app.get('/inicio', (req, res) => {
+  res.render('index');  
+});
+
+const URIMongoDB = process.env.URIMONGO;
+mongoose.connect(URIMongoDB)
+console.log(`Conectado a la base de datos de MongoDB`);
+
+app.get("/realtimeproducts", async (req, res) => {
+  try {
+    const products = await ProductModel.find();
     res.render("realTimeProducts", { products });
-  });
+  } catch (error) {
+    console.error("Error al obtener los productos:", error);
+    res.status(500).send("Error al obtener los productos");
+  }
+});
 
 const server = createServer(app);
-const io = new socketIo(server);
-
-
-io.on("connection", (socket) => {
-    socket.emit("updateProducts", ProductManager.getProducts());
-  
-    socket.on("addProduct", (newProduct) => {
-      ProductManager.addProduct(newProduct);
-      io.emit("updateProducts", ProductManager.getProducts());
-    });
-  
-    socket.on("deleteProduct", (id) => {
-      ProductManager.deleteProduct(id);
-      io.emit("updateProducts", ProductManager.getProducts());
-    });
-  });
-  
-
 server.listen(8080, () => {
     console.log('Servidor escuchando en puerto 8080');
 });
