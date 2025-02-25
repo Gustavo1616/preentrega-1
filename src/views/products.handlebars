@@ -1,16 +1,38 @@
 <h1>Lista de productos</h1>
 {{#each products}}
-<ul>
-    <li>
-        <h2>{{this.name}}</h2>
-        <a href="/products/{{this._id}}">Ver detalle</a>
-        <form action="/products/{{this._id}}?_method=DELETE" method="POST">
-            <input type="hidden" name="_method" value="DELETE">
-            <button class="button-error" type="submit">Eliminar</button>
-        </form>
-    </li>
-</ul>
+    <ul>
+        <li>
+            <h2>{{this.name}}</h2>
+            <p>Precio: ${{this.price}}</p>
+            <p>description: {{this.description}}</p>
+
+            <a href="/products/{{this._id}}">Ver detalles</a>
+
+            {{#if cartId}}
+            <form action="/carts/{{cartId}}/product/{{this._id}}" method="POST">
+                    <button type="submit">Agregar al carrito</button>
+            </form>
+            {{else}}
+                <p>El carrito no está disponible, ingrese a "Ver detalles" para crear uno.</p>
+            {{/if}}
+            <form action="/products/{{this._id}}?_method=DELETE" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este producto?');">
+                <button type="submit">Eliminar producto</button>
+            </form>
+        </li>
+    </ul>
 {{/each}}
+
+
+<div>
+    {{#if info.hasPrevPage}}
+        <a href="/products?page={{info.prevPage}}&limit={{info.limit}}">Página Anterior</a>
+    {{/if}}
+
+    {{#if info.hasNextPage}}
+        <a href="/products?page={{info.nextPage}}&limit={{info.limit}}">Página Siguiente</a>
+    {{/if}}
+</div>
+
 <a href="/inicio">
-        <button>Volver al Inicio</button>
+    <button>Volver al Inicio</button>
 </a>

@@ -1,33 +1,56 @@
-import { Router } from "express";
-import CartManager from "../models/cartManager.js";
+import { Router } from 'express';
+import CartModel from '../models/cart.model.js';
+import ProductModel from '../models/product.model.js';
 
 const router = Router();
 
-router.post("/", (req, res) => {
-  const newCart = CartManager.addCart();
-  res.status(201).json(newCart); 
-});
 
+router.post('/carts/:cartId/product/:productId', async (req, res) => {
+  try {
+      const { cartId, productId } = req.params;
 
-router.get("/:cid", (req, res) => {
-  const { cid } = req.params; 
-  const cart = CartManager.getCartById(cid); 
+      let cart = await CartModel.findById(cartId);
+      if (!cart) {
+          return res.render('error', { error: 'Carrito no encontrado' });
+      }
+      const product = await ProductModel.findById(productId);
+      if (!product) {
+          return res.render('error', { error: 'Producto no encontrado' });
+      }
 
-  if (!cart) {
-    return res.status(404).json({ message: "Cart not found" });
+      const existingProduct = cart.products.find(item => item.product.toString() === product._id.toString());
+      if (existingProduct) {
+          existingProduct.quantity += 1;
+      } else {
+          cart.products.push({ product: product._id, quantity: 1 });
+      }
+      await cart.save();
+
+      res.redirect(`/cart/${cart._id}`);
+  } catch (error) {
+      console.error("Error al agregar producto al carrito:", error);
+      res.render('error', { error: 'Error al agregar el producto al carrito' });
   }
-  res.json(cart.products); 
 });
 
+router.get('/carts/:cid', async (req, res) => {
+  try {
+      const { cid } = req.params;
+      const cart = await CartModel.findById(cid).populate('products.product');
 
-router.post("/:cid/product/:pid", (req, res) => {
-  const { cid, pid } = req.params; 
-  const cart = CartManager.addProductToCart(cid, pid); 
+      if (!cart) {
+          return res.render('error', { error: 'Carrito no encontrado' });
+      }
 
-  if (!cart) {
-    return res.status(404).json({ message: "Cart not found" }); 
+      res.render('cart', { cart: cart.toObject() });
+  } catch (error) {
+      console.error("Error al obtener el carrito:", error);
+      res.render('error', { error: 'Error al obtener el carrito' });
   }
-  res.json(cart); 
 });
+
+
 
 export default router;
+
+
