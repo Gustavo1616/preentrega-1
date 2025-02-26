@@ -1,38 +1,39 @@
-<h1>Lista de productos</h1>
-{{#each products}}
-    <ul>
+<h1>Product List</h1>
+
+<form action="/products" method="GET">
+    <label for="category">Categoría:</label>
+    <input type="text" name="category" id="category" value="{{category}}">
+
+    <label for="availability">Disponible:</label>
+    <select name="availability" id="availability">
+        <option value="">Todos</option>
+        <option value="true" {{#if (eq availability "true")}}selected{{/if}}>Disponible</option>
+        <option value="false" {{#if (eq availability "false")}}selected{{/if}}>No disponible</option>
+    </select>
+
+    <label for="sort">Ordenar por precio:</label>
+    <select name="sort" id="sort">
+        <option value="">Sin orden</option>
+        <option value="asc" {{#if (eq sort "asc")}}selected{{/if}}>Menor a Mayor</option>
+        <option value="desc" {{#if (eq sort "desc")}}selected{{/if}}>Mayor a Menor</option>
+    </select>
+
+    <button type="submit">Buscar</button>
+</form>
+
+<ul>
+    {{#each products}}
         <li>
-            <h2>{{this.name}}</h2>
-            <p>Precio: ${{this.price}}</p>
-            <p>description: {{this.description}}</p>
-
-            <a href="/products/{{this._id}}">Ver detalles</a>
-
-            {{#if cartId}}
-            <form action="/carts/{{cartId}}/product/{{this._id}}" method="POST">
-                    <button type="submit">Agregar al carrito</button>
-            </form>
-            {{else}}
-                <p>El carrito no está disponible, ingrese a "Ver detalles" para crear uno.</p>
-            {{/if}}
-            <form action="/products/{{this._id}}?_method=DELETE" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este producto?');">
-                <button type="submit">Eliminar producto</button>
+            <strong>{{this.name}}</strong> - ${{this.price}} - {{this.category}} - 
+            {{#if this.availability}}Disponible{{else}}No Disponible{{/if}} - 
+            Stock: {{this.stock}}
+            <br>
+            <a href="/products/{{this._id}}">Ver detalles</a> 
+            <form action="/carts/add/{{this._id}}" method="POST" style="display:inline;">
+                <button type="submit">Agregar al carrito</button>
             </form>
         </li>
-    </ul>
-{{/each}}
+    {{/each}}
+</ul>
 
-
-<div>
-    {{#if info.hasPrevPage}}
-        <a href="/products?page={{info.prevPage}}&limit={{info.limit}}">Página Anterior</a>
-    {{/if}}
-
-    {{#if info.hasNextPage}}
-        <a href="/products?page={{info.nextPage}}&limit={{info.limit}}">Página Siguiente</a>
-    {{/if}}
-</div>
-
-<a href="/inicio">
-    <button>Volver al Inicio</button>
-</a>
+<a href="/">Volver al inicio</a>

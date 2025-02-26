@@ -2,17 +2,11 @@
 <p>{{product.description}}</p>
 <p>Precio: ${{product.price}}</p>
 <p>Categoria: {{product.category}}</p>
+<p>Stock: {{product.stock}}</p>
 
-
-{{#if cartId}}
-    <form action="/carts/{{cartId}}/product/{{product._id}}" method="POST">
-        <button type="submit">Agregar al carrito</button>
-    </form>
-{{else}}
-    <form action="/products/carts/create-and-add-to-cart/{{product._id}}" method="POST">
-        <button type="submit">Crear carrito y agregar al carrito</button>
-    </form>
-{{/if}}
+<form action="/carts/add/{{product._id}}" method="POST" style="display:inline;">
+    <button type="submit">Agregar al carrito</button>
+</form>
 
 <a href="/products">
     <button>Volver a la lista de productos</button>

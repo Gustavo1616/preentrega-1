@@ -1,56 +1,64 @@
-import { Router } from 'express';
-import CartModel from '../models/cart.model.js';
-import ProductModel from '../models/product.model.js';
+import express from "express";
+import Cart from "../models/cart.model.js";
 
-const router = Router();
+const router = express.Router();
 
 
-router.post('/carts/:cartId/product/:productId', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-      const { cartId, productId } = req.params;
+    let cart = await Cart.findOne().populate("products.product");
 
-      let cart = await CartModel.findById(cartId);
-      if (!cart) {
-          return res.render('error', { error: 'Carrito no encontrado' });
-      }
-      const product = await ProductModel.findById(productId);
-      if (!product) {
-          return res.render('error', { error: 'Producto no encontrado' });
-      }
-
-      const existingProduct = cart.products.find(item => item.product.toString() === product._id.toString());
-      if (existingProduct) {
-          existingProduct.quantity += 1;
-      } else {
-          cart.products.push({ product: product._id, quantity: 1 });
-      }
+    if (!cart) {
+      cart = new Cart({ products: [] });
       await cart.save();
-
-      res.redirect(`/cart/${cart._id}`);
+    }
+    res.render("cart", { cart: cart.toObject() });
   } catch (error) {
-      console.error("Error al agregar producto al carrito:", error);
-      res.render('error', { error: 'Error al agregar el producto al carrito' });
+    console.error("Error fetching the cart:", error.message);
+    res.render("error", { error: 'Error al obtener el carrito' });
   }
 });
 
-router.get('/carts/:cid', async (req, res) => {
-  try {
-      const { cid } = req.params;
-      const cart = await CartModel.findById(cid).populate('products.product');
-
+router.post("/add/:productId", async (req, res) => {
+    try {
+      const { productId } = req.params;
+      let cart = await Cart.findOne();
+  
       if (!cart) {
-          return res.render('error', { error: 'Carrito no encontrado' });
+        cart = new Cart({ products: [] });
       }
-
-      res.render('cart', { cart: cart.toObject() });
-  } catch (error) {
-      console.error("Error al obtener el carrito:", error);
-      res.render('error', { error: 'Error al obtener el carrito' });
-  }
-});
-
-
-
+  
+      const productIndex = cart.products.findIndex(p => p.product.toString() === productId);
+  
+      if (productIndex !== -1) {
+        cart.products[productIndex].quantity += 1;
+      } else {
+        cart.products.push({ product: productId, quantity: 1 });
+      }
+  
+      await cart.save();
+      res.redirect("/carts");
+    } catch (error) {
+      res.render("error", { error: 'Error al agregar el producto al carrito' });
+    }
+  });
+  
+  router.post("/remove/:productId", async (req, res) => {
+    try {
+      const { productId } = req.params;
+      let cart = await Cart.findOne();
+  
+      if (!cart) {
+        return res.redirect("/carts");
+      }
+      cart.products = cart.products.filter(p => p.product.toString() !== productId);
+      await cart.save();
+  
+      res.redirect("/carts");
+    } catch (error) {
+      console.error("Error al eliminar el producto:", error);
+      res.render("error", { error: "Error al eliminar el producto del carrito" });
+    }
+  });
+  
 export default router;
-
-

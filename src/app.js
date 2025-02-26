@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
 
-app.use('/cart', cartRouter);
+app.use('/carts', cartRouter);
 app.use('/', viewsRouter);
 app.use('/products', productsDBRouter); //Creo nuevo router, para renderizar productos desde la base de datos
 
@@ -34,7 +34,6 @@ app.use('/products', productsDBRouter); //Creo nuevo router, para renderizar pro
 app.get('/inicio', (req, res) => {
   res.render('index');  
 });
-
 const URIMongoDB = process.env.URIMONGO;
 mongoose.connect(URIMongoDB)
 console.log(`Conectado a la base de datos de MongoDB`);
@@ -45,3 +44,12 @@ server.listen(8080, () => {
 });
 
 
+app.engine("handlebars", handlebars.engine({
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,  
+    allowProtoMethodsByDefault: true
+  },
+  helpers: {
+    eq: (a, b) => a === b
+  }
+}));

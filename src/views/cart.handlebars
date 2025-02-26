@@ -1,20 +1,17 @@
-<h1>Carrito de Compras</h1>
+<h1>Carrito</h1>
+<a href="/">Inicio</a>
+<a href="/products">Volver a Productos</a>
+<ul>
+    {{#each cart.products}}
+    <li>
+        <h2>{{this.product.name}}</h2>
+        <p>Precio: ${{this.product.price}}</p>
+        <p>Cantidad: {{this.quantity}}</p>
+     <form action="/carts/remove/{{this.product._id}}" method="POST">
+    <input type="hidden" name="_method" value="DELETE" />
+    <button type="submit">Eliminar</button>
+</form>
 
-{{#if cart.products.length}}
-    <ul>
-        {{#each cart.products}}
-            <li>
-                <h3>{{this.product.name}}</h3>
-                <p>Cantidad: {{this.quantity}}</p>
-                <p>Precio: ${{this.product.price}}</p>
-            </li>
-        {{/each}}
-    </ul>
-    <p>Total: ${{cart.products.reduce((acc, item) => acc + item.product.price * item.quantity, 0)}}</p>
-{{else}}
-    <p>El carrito está vacío.</p>
-{{/if}}
-
-<a href="/products">
-    <button>Volver a la lista de productos</button>
-</a>
+    </li>
+    {{/each}}
+</ul>
